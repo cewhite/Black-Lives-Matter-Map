@@ -40,8 +40,9 @@
   .style('font-family', 'Open Sans')
   .style('z-index', 1000);
 
+
   d3.json('https://raw.githubusercontent.com/ameliapower/d3BubbleMap/master/builds/development/js/json/poverty/us.json'),
-    function(error, usa){
+    function(error, usa){                                 // borrrowed data source for now ^^^
     if (error)
     return console.log(error);
 
@@ -60,6 +61,39 @@
     .attr('id', function(d) { return d.id; })
     .attr("class", "states states-hover")
     .attr('d', path)
+
+
+         //add Tool Tip
+
+    .on('mouseover', function(d, i){
+      toolTip.transition()
+        .style('opacity', .9)
+        .style('left', (d3.event.pageX) + 'px')
+        .style('top', (d3.event.pageY) + 'px')
+      tempColor = this.style.fill; //store current color
+      if(d.properties.name != null || d.properties.name != undefined){
+        toolTip.html(d.properties.name + ", " + d.properties.population)
+      } else {
+        toolTip.html("")
+      }
+    })
+
+    .on('mouseout', function(){
+      d3.select(this)
+       .transition().delay(400).duration(800)
+       .style('opacity', 1)
+       .style('fill', tempColor)
+    })
+
+    //build internal state lines
+
+  svg.append('path')
+    .datum(topojson.mesh(usa, usa.objects.states, function(a, b) {
+      return a !== b;
+    }))
+    //topojson.mesh
+    .attr('class', 'border-states')
+    .attr('d', path);
 
 
 
