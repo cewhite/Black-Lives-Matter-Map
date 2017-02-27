@@ -25,7 +25,7 @@
   var radius = d3.scale.sqrt()
   .domain([0, 3e6])
   // INPUT domain-range of possible input data values
-  //To avoid distortion, make sure that the minimum "domain" and "range" values are both 0.range([0, 60]);
+  //To avoid distortion, minimum "domain" and "range" values are both 0.range([0, 60]);
   // OUTPUT range of possible output values
 
   var arc = d3.svg.arc()
@@ -111,12 +111,26 @@
       })     //sort
     )       //data
 
+    .enter().append("circle")
+   .on('mouseover',
+    function(d, i){
+      d3.select(this).attr('class', 'hover')
+    })
 
+    .on('mouseout',
+      function(d, i){
+      d3.select(this).attr('class', '')
+    })
+    .attr("transform",
+     function(d) {
+      return "translate(" + path.centroid(d) + ")";
+      //Computes the projected centroid
+    })
+    .attr("r", function(d) {
+      return radius(d.properties.population);
+      //radius var with input (domain) and output (range)
+    })
 
-
-
-
-
-
-  </script>
+};
+</script>
 </body>
