@@ -7,3 +7,50 @@
 <link rel="stylesheet" type="text/css" href="/assets/style.css">
 <link href="https://fonts.googleapis.com/css?family=Supermercado+One" rel="stylesheet">
 </head>
+
+<body>
+  <script>
+  var width = 1000,
+  height = 600;
+
+  var path = d3.geo.path()
+  .projection(null)
+  //albersUsa projection stated in Make file when creating the topojson data
+
+  var radius = d3.scale.sqrt()
+  .domain([0, 3e6])
+  // INPUT domain-range of possible input data values
+  //To avoid distortion, make sure that the minimum "domain" and "range" values are both 0
+  .range([0, 60]);
+  // OUTPUT range of possible output values
+
+  var arc = d3.svg.arc()
+  .outerRadius(radius)
+
+var svg = d3.select('body').append('svg')
+  .attr('height', height)
+  .attr('width', width);
+
+  d3.json('https://raw.githubusercontent.com/ameliapower/d3BubbleMap/master/builds/development/js/json/poverty/us.json'),
+    function(error, usa){
+    if (error)
+    return console.log(error);
+}
+    //build the main land area
+
+  svg.append('path')
+    .datum(topojson.feature(usa, usa.objects.nation))
+    .attr('class', 'land')
+    .attr('d', path);
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
