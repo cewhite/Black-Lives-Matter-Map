@@ -6,10 +6,15 @@
 <h1>Black Lives Matter</h1>
 <link rel="stylesheet" type="text/css" href="/assets/style.css">
 <link href="https://fonts.googleapis.com/css?family=Supermercado+One" rel="stylesheet">
+
 </head>
 
 <body>
-  <script>
+
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script>
+
+<script>
   var width = 1000,
   height = 600;
 
@@ -20,8 +25,7 @@
   var radius = d3.scale.sqrt()
   .domain([0, 3e6])
   // INPUT domain-range of possible input data values
-  //To avoid distortion, make sure that the minimum "domain" and "range" values are both 0
-  .range([0, 60]);
+  //To avoid distortion, make sure that the minimum "domain" and "range" values are both 0.range([0, 60]);
   // OUTPUT range of possible output values
 
   var arc = d3.svg.arc()
@@ -95,6 +99,17 @@
     .attr('class', 'border-states')
     .attr('d', path);
 
+    //show data as layered bubbles
+
+  svg.append("g")
+    .attr("class", "bubble")
+    .selectAll("circle")
+    .data(topojson.feature(usa, usa.objects.counties).features
+      .sort(function(a, b) {
+              //sort population low to high
+        return b.properties.population - a.properties.population;
+      })     //sort
+    )       //data
 
 
 
