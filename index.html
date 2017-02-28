@@ -1,103 +1,140 @@
-<!DOCTYPE html>
-
+ <!DOCTYPE html>
+<html>
 
 <head>
 <meta charset="utf-8">
 <h1>Black Lives Matter</h1>
-<link rel="stylesheet" type="text/css" href="/assets/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./assets/style.css">
 <link href="https://fonts.googleapis.com/css?family=Supermercado+One" rel="stylesheet">
 
 </head>
+<style>
+  .land {
+  fill: black;
+}
 
+.border {
+  fill: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.bubble {
+  fill: red;
+  fill-opacity: .5;
+  stroke: #fff;
+  stroke-width: .5px;
+}
+
+.bubble :hover {
+  stroke: #000;
+}
+
+</style>
 <body>
 
-<script src="//d3js.org/d3.v3.min.js"></script>
-<script src="//d3js.org/topojson.v1.min.js"></script>
+ <!-- <script src="//d3js.org/d3.v3.min.js"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script> -->
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.14/d3.min.js"></script>
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.20/topojson.min.js"></script>
 
 <script>
-  var width = 1000,
-  height = 600;
+
+  var width = 960,
+        height = 600;
+
+  var formatNumber = d3.format(",.0f");
 
   var path = d3.geo.path()
-  .projection(null)
+  .projection(null);
+
   //albersUsa projection stated in Make file when creating the topojson data
 
   var radius = d3.scale.sqrt()
-  .domain([0, 3e6])
+      .domain([0, 1e6])
+      .range([0, 15]);
+
   // INPUT domain-range of possible input data values
   //To avoid distortion, minimum "domain" and "range" values are both 0.range([0, 60]);
   // OUTPUT range of possible output values
 
-  var arc = d3.svg.arc()
-  .outerRadius(radius)
+  // var arc = d3.svg.arc()
+  // .outerRadius(radius);
 
-  var svg = d3.select('body').append('svg')
-  .attr('height', height)
-  .attr('width', width);
+  var svg = d3.select("body").append("svg")
+  .attr("height", height)
+  .attr("width", width);
 
-  var toolTip = d3.select('body')
-  .append('div')
-  .style('position', 'absolute')
-  .style('padding', '0 10px')
-  .style('background', '#fff')
-  .style('opacity', 0)
-  .style('font-family', 'Open Sans')
-  .style('z-index', 1000);
+  // var toolTip = d3.select('body')
+  // .append('div')
+  // .style('position', 'absolute')
+  // .style('padding', '0 10px')
+  // .style('background', '#fff')
+  // .style('opacity', 0)
+  // .style('font-family', 'Supermercado One')
+  // .style('z-index', 1000);
 
 
-  d3.json('https://raw.githubusercontent.com/ameliapower/d3BubbleMap/master/builds/development/js/json/poverty/us.json'),
-    function(error, usa){                                 // borrrowed data source for now ^^^
-    if (error)
-    return console.log(error);
+  d3.json('https://raw.githubusercontent.com/ameliapower/d3BubbleMap/master/builds/development/js/json/poverty/us.json',
+    function(error, usa) {
+    // borrrowed data source for now
+    if (error) {
+      throw(error);
+     } else {
 
     //build main map area
 
-  svg.append('path')
+  svg.append("path")
     .datum(topojson.feature(usa, usa.objects.nation))
-    .attr('class', 'land')
-    .attr('d', path);
+    .attr("class", "land")
+    .attr("d", path);
 
   // retrieve the features so that id is accessed
 
-  svg.selectAll('.states')
-    .data(topojson.feature(usa, usa.objects.counties).features)
-    .enter().append('path')
-    .attr('id', function(d) { return d.id; })
-    .attr("class", "states states-hover")
-    .attr('d', path)
+  // svg.selectAll('.states')
+  //   .data(topojson.feature(usa, usa.objects.counties).features)
+  //   .enter().append('path')
+  //   .attr('id', function(d) {
+  //       return d.id;
+  //     }
+  //       )
+  //   .attr("class", "states states-hover")
+  //   .attr('d', path)
 
 
-         //add Tool Tip
+    //      //add Tool Tip
 
-    .on('mouseover', function(d, i){
-      toolTip.transition()
-        .style('opacity', .9)
-        .style('left', (d3.event.pageX) + 'px')
-        .style('top', (d3.event.pageY) + 'px')
-      tempColor = this.style.fill; //store current color
-      if(d.properties.name != null || d.properties.name != undefined){
-        toolTip.html(d.properties.name + ", " + d.properties.population)
-      } else {
-        toolTip.html("")
-      }
-    })
+    // .on('mouseover', function(d, i){
+    //   toolTip.transition()
+    //     .style('opacity', .9)
+    //     .style('left', (d3.event.pageX) + 'px')
+    //     .style('top', (d3.event.pageY) + 'px')
+    //   tempColor = this.style.fill; //store current color
+    //   if(d.properties.name != null || d.properties.name != undefined){
+    //     toolTip.html(d.properties.name + ", " + d.properties.population)
+    //   } else {
+    //     toolTip.html("")
+    //   }
+    // })
 
-    .on('mouseout', function(){
-      d3.select(this)
-       .transition().delay(400).duration(800)
-       .style('opacity', 1)
-       .style('fill', tempColor)
-    })
+    // .on('mouseout', function(){
+    //   d3.select(this)
+    //    .transition().delay(400).duration(800)
+    //    .style('opacity', 1)
+    //    .style('fill', tempColor)
+    // })
 
     //build internal state lines
 
-  svg.append('path')
+  svg.append("path")
     .datum(topojson.mesh(usa, usa.objects.states, function(a, b) {
       return a !== b;
     }))
     //topojson.mesh
-    .attr('class', 'border-states')
-    .attr('d', path);
+    .attr("class", "border-states")
+    .attr("d", path);
 
     //show data as layered bubbles
 
@@ -112,25 +149,29 @@
     )       //data
 
     .enter().append("circle")
-   .on('mouseover',
-    function(d, i){
+   .on('mouseover',function(d, i){
       d3.select(this).attr('class', 'hover')
     })
 
-    .on('mouseout',
-      function(d, i){
+    .on('mouseout',function(d, i){
       d3.select(this).attr('class', '')
     })
-    .attr("transform",
-     function(d) {
+    .attr("transform", function(d) {
       return "translate(" + path.centroid(d) + ")";
       //Computes the projected centroid
     })
     .attr("r", function(d) {
       return radius(d.properties.population);
-      //radius var with input (domain) and output (range)
-    })
+      // radius var with input (domain) and output (range)
 
-};
+
+    })
+  }
+});
+
+  d3.select(self.frameElement).style("height", height + "px");
+
 </script>
 </body>
+</html>
+
