@@ -1,5 +1,4 @@
-
-
+/*
 body{width:1000px;}
 
 h1{font: small-caps 300 2em/1.5em
@@ -9,7 +8,7 @@ h1{font: small-caps 300 2em/1.5em
   }
 
 .land{
-  fill: #ddd;
+  fill: black;
    }
 
 .border-states{
@@ -25,3 +24,4 @@ h1{font: small-caps 300 2em/1.5em
 
 .hover{stroke:#666; fill-opacity: .8;}
 
+*/
