@@ -1,8 +1,12 @@
-/*
-body{width:1000px;}
+
+body{
+  width:100%;
+  background-color: grey;
+  font-family: 'fallback', sans-serif;
+}
 
 h1{font: small-caps 300 2em/1.5em
-    font-family: 'Supermercado One', cursive;
+    font-family: 'fallback', sans-serif;
     text-align: center;
     margin: 20px auto 0;padding: 0;
   }
@@ -10,18 +14,27 @@ h1{font: small-caps 300 2em/1.5em
 .land{
   fill: black;
    }
-
-.border-states{
+/*can't decide if i prefer states to be bordred or not*/
+/*.border-states{
   stroke: #fff;
   fill: none;
   stroke-linejoin: round;
   stroke-linecap: round;
+}*/
+
+.bubble {
+  fill: red;
+  fill-opacity: .5;
+  stroke: #606060;
+  stroke-width: .5px;
 }
 
-.states{fill: #aec7e8;}
+.bubble :hover {
+  stroke: #606060;
+}
 
-.bubble{fill:red; fill-opacity: .5;}
-
-.hover{stroke:#666; fill-opacity: .8;}
-
-*/
+.legend text {
+  fill: #777;
+  font: 10px fallback: sans-serif;
+  text-anchor: middle;
+}
