@@ -38,3 +38,16 @@ h1{font: small-caps 300 2em/1.5em
   font: 10px fallback: sans-serif;
   text-anchor: middle;
 }
+
+.tooltip {
+  position: absolute;
+  max-width: 400px;
+  height: auto;
+  padding: 5px;
+  background-color: #606060;
+  pointer-events: none;
+  font-family: fallback: sans-serif;
+  font-size: 12px; color #fff;
+}
+
+
