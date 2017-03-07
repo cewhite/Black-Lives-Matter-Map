@@ -6,85 +6,92 @@
 <h1>Black Lives Matter</h1>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="./assets/style.css">
-<link href="https://fonts.googleapis.com/css?family=Supermercado+One" rel="stylesheet">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600">
+
 
 </head>
-<style>
-  .land {
-  fill: black;
-}
 
-.border {
-  fill: none;
-  stroke: #fff;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
+<body style="text-align:center;">
 
-.bubble {
-  fill: red;
-  fill-opacity: .5;
-  stroke: #fff;
-  stroke-width: .5px;
-}
-
-.bubble :hover {
-  stroke: #000;
-}
-
-</style>
-<body>
-
- <!-- <script src="//d3js.org/d3.v3.min.js"></script>
-<script src="//d3js.org/topojson.v1.min.js"></script> -->
 <script src ="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.14/d3.min.js"></script>
 <script src ="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.20/topojson.min.js"></script>
-
+<script src ="http://d3js.org/queue.v1.min.js"></script>
+<!-- read in data asynchronously then call function -->
 <script>
 
   var width = 960,
         height = 600;
 
-  var formatNumber = d3.format(",.0f");
 
+// format pop/data
   var path = d3.geo.path()
   .projection(null);
 
-  //albersUsa projection stated in Make file when creating the topojson data
-
   var radius = d3.scale.sqrt()
-      .domain([0, 1e6])
+      .domain([0, 1e5])
       .range([0, 15]);
+// function for bubble sizes
+
+var formatNumber = d3.format(".0f");
+
+  function formatNumber(val) {
+    var prefix = d3.formatPrefix(val),
+          format = d3.format(".0f");
+      return format(prefix.scale(val)) + prefix.symbol;
+  }
 
   // INPUT domain-range of possible input data values
   //To avoid distortion, minimum "domain" and "range" values are both 0.range([0, 60]);
   // OUTPUT range of possible output values
 
-  // var arc = d3.svg.arc()
-  // .outerRadius(radius);
-
   var svg = d3.select("body").append("svg")
   .attr("height", height)
   .attr("width", width);
 
-  // var toolTip = d3.select('body')
-  // .append('div')
-  // .style('position', 'absolute')
-  // .style('padding', '0 10px')
-  // .style('background', '#fff')
-  // .style('opacity', 0)
-  // .style('font-family', 'Supermercado One')
-  // .style('z-index', 1000);
+  var legend = svg.append("g")
+    .attr("class", "legend")
+    .attr("transform", "translate("+ (width - 50) + "," + (height - 20) +")")
+    .selectAll("g")
+    .data([1e5, 5e6, 1e6])
+    .enter().append("g");
 
+    legend.append("circle")
+      .attr("cy", function(d) { return -radius(d); })
+      .attr("r", radius);
+
+      legend.append("text")
+        .attr("y", function(d) { return -2 * radius(d); })
+        .attr("dy", "1.3em")
+        .text(d3.format(".0f"));
+
+// add legend note that legend is dynamic to data so does not render exactly for the dummy data used
+
+    var barTooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+    .style("width", 600);
 
   d3.json('https://raw.githubusercontent.com/ameliapower/d3BubbleMap/master/builds/development/js/json/poverty/us.json',
     function(error, usa) {
     // borrrowed data source for now
-    if (error) {
+    if (error)
+//       return console.error(error);
+// });
+
+    {
       throw(error);
      } else {
 
-    //build main map area
+ // add data queue for  to compile future files/build charts
+      queue()
+       .defer(d3.json, 'https://raw.githubusercontent.com/ameliapower/d3BubbleMap/master/builds/development/js/json/poverty/us.json')
+       .await(ready);
+
+    function ready(error, usa) {
+      if (error) throw error;
+}
+
+      //build main map area
 
   svg.append("path")
     .datum(topojson.feature(usa, usa.objects.nation))
@@ -93,38 +100,37 @@
 
   // retrieve the features so that id is accessed
 
-  // svg.selectAll('.states')
-  //   .data(topojson.feature(usa, usa.objects.counties).features)
-  //   .enter().append('path')
-  //   .attr('id', function(d) {
-  //       return d.id;
-  //     }
-  //       )
-  //   .attr("class", "states states-hover")
-  //   .attr('d', path)
+  svg.selectAll('.states')
+    .data(topojson.feature(usa, usa.objects.counties).features)
+    .enter().append('path')
+    .attr('id', function(d) {
+        return d.id;
+      }
+         )
+    .attr("class", "states states-hover")
+    .attr('d', path)
 
 
-    //      //add Tool Tip
 
-    // .on('mouseover', function(d, i){
-    //   toolTip.transition()
-    //     .style('opacity', .9)
-    //     .style('left', (d3.event.pageX) + 'px')
-    //     .style('top', (d3.event.pageY) + 'px')
-    //   tempColor = this.style.fill; //store current color
-    //   if(d.properties.name != null || d.properties.name != undefined){
-    //     toolTip.html(d.properties.name + ", " + d.properties.population)
-    //   } else {
-    //     toolTip.html("")
-    //   }
-    // })
+    .on('mouseover', function(d, i){
+      toolTip.transition()
+        .style('opacity', .9)
+        .style('left', (d3.event.pageX) + 'px')
+        .style('top', (d3.event.pageY) + 'px')
+      tempColor = this.style.fill; //store current color
+      if(d.properties.name != null || d.properties.name != undefined){
+        toolTip.html(d.properties.name + ", " + d.properties.population)
+      } else {
+        toolTip.html("")
+      }
+    })
 
-    // .on('mouseout', function(){
-    //   d3.select(this)
-    //    .transition().delay(400).duration(800)
-    //    .style('opacity', 1)
-    //    .style('fill', tempColor)
-    // })
+    .on('mouseout', function(){
+      d3.select(this)
+       .transition().delay(400).duration(800)
+       .style('opacity', 0)
+       .style('fill', tempColor)
+    })
 
     //build internal state lines
 
@@ -132,11 +138,12 @@
     .datum(topojson.mesh(usa, usa.objects.states, function(a, b) {
       return a !== b;
     }))
+
     //topojson.mesh
     .attr("class", "border-states")
     .attr("d", path);
 
-    //show data as layered bubbles
+    //show data  bubbles
 
   svg.append("g")
     .attr("class", "bubble")
@@ -145,31 +152,135 @@
       .sort(function(a, b) {
               //sort population low to high
         return b.properties.population - a.properties.population;
-      })     //sort
-    )       //data
+      })     //sort data
+    )
+  .enter().append("circle")
 
-    .enter().append("circle")
-   .on('mouseover',function(d, i){
-      d3.select(this).attr('class', 'hover')
-    })
 
-    .on('mouseout',function(d, i){
-      d3.select(this).attr('class', '')
-    })
     .attr("transform", function(d) {
       return "translate(" + path.centroid(d) + ")";
-      //Computes the projected centroid
+      //projected centroid
     })
     .attr("r", function(d) {
-      return radius(d.properties.population);
+      return radius(d.properties.population); })
       // radius var with input (domain) and output (range)
+    .on("mouseover", function(d) {
+      var circleId = d.id;
+      barTooltip.transition()
+        .duration(500)
+        .style("opacity", .7);
+
+    var tip = "<h3>" + d.properties.name +"</h3>";
+    var tip = "<h3>" + d.properties.population + "</h3>";
+    var tip = "<h4>Murdered By Police In 2017</h4>";
+
+    barTooltip.html(tip)
+      .style("left", (d3.event.pageX) + "px")
+      .style("top", (d3.event.pageY) + "px");
+
+      var margin = {top: 20, right: 30, bottom: 30, left: 40},
+            height = 60,
+            width = 200;
+
+      var x =d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1);
+
+      var y = d3.scale.linear()
+            .range([height, 0]);
+
+      var xAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .tickFormat(d3.format("s"))
+            .ticks(2);
+
+      var chart = barTooltip.append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            x.domain(population.map(function(d) {return d.population; }));
+            y.domain([0, d3.max(population.filter(function(d) { return d.id == circleId}),
+              function(d) { return d.sales; })]);
+
+        chart.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(xAxis);
+
+      chart.append("g")
+            .attr("class", "y-axis")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(yAxis);
+
+      chart.selectAll("#barChart")
+            .data(population)
+            .enter().append("rect")
+            .filter(function(d) { return d.id == circleId })
+            .attr("class", "bar")
+            .attr("x", function(d) { return x(d.name); })
+            .attr("y", function(d) { returny(d.population); })
+            .attr("height", function(d) { return height-y(d.population); })
+            .attr("width", x.rangeBand());
 
 
-    })
+  })
+    .on("mouseout", function(d) {
+      barTooltip.transition()
+      .duration(500)
+      .style("opacity", 0);
+    });
+
+    var chart = barTooltip.append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" +margin.left + ","
+      + margin.top + ")");
+    // make filter to the current ID
+    x.domain(usa.map(function(d) {
+      return d.population;  }));
+    y.domain([0, d3.max(usa.filter(
+      function(d) { return d.id == circleId}),
+      function(d) { return d.population; } )
+    ]);
+
+    // add axes
+
+    chart.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+    chart.append("g")
+      .attr("class", "y-axis")
+      .call(yAxis);
+
+    // build bar chart
+    chart.selectAll("#barChart")
+      .data(population)
+      .enter( ).append("rect")
+      // filter for state
+      .filter(function(d) { return d.id == circleId})
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.name); })
+      .attr("y", function(d) { return y(d.population); })
+      .attr("height", function(d) { return height - y(d.population); })
+      .attr("width", x.rangeBand());
+
   }
+
+
 });
 
-  d3.select(self.frameElement).style("height", height + "px");
+
+   d3.select(self.frameElement).style("height", height + "px");
+
+
+
+
+
 
 </script>
 </body>
